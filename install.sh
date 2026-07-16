@@ -13,6 +13,22 @@ err() {
     exit 1
 }
 
+# The shell the user will paste commands into is this script's parent (with
+# `curl | sh` that's the interactive shell). $SHELL alone is not enough: it
+# is not always exported, and it names the login shell, not the current one.
+detect_shell() {
+    if [ -r "/proc/$PPID/comm" ]; then
+        comm=$(cat "/proc/$PPID/comm" 2>/dev/null || true)
+    else
+        comm=$(ps -o comm= -p "$PPID" 2>/dev/null || true)
+    fi
+    comm=${comm#-} # login shells report as e.g. "-bash"
+    case "$comm" in
+        bash | zsh | ksh | fish | ash | dash) echo "$comm" && return ;;
+    esac
+    basename "${SHELL:-sh}"
+}
+
 os=$(uname -s)
 arch=$(uname -m)
 case "$os" in
@@ -68,7 +84,7 @@ case ":$PATH:" in
         esac
         echo
         echo "note: $bin_dir is not on your PATH; git needs it there to find the helper."
-        shell_name=$(basename "${SHELL:-sh}")
+        shell_name=$(detect_shell)
         if [ "$shell_name" = fish ]; then
             echo "To add it, now and permanently:"
             echo
@@ -83,6 +99,7 @@ case ":$PATH:" in
                 bash) rc="~/.bashrc" src="source ~/.bashrc" ;;
                 zsh) rc="~/.zshrc" src="source ~/.zshrc" ;;
                 ksh) rc="~/.kshrc" src=". ~/.kshrc" ;;
+                ash | dash | sh) rc="~/.profile" src=". ~/.profile" ;;
                 *) rc="" ;;
             esac
             if [ -n "$rc" ]; then
