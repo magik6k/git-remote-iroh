@@ -25,7 +25,7 @@ each reach the internet (or each other).
 
 ## Install
 
-Prebuilt binary (Linux and macOS, installs to `~/.local/bin`):
+Prebuilt binary (Linux, Apple-silicon macOS; installs to `~/.local/bin`):
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/magik6k/git-remote-iroh/main/install.sh | sh

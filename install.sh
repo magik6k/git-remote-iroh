@@ -25,9 +25,8 @@ case "$os" in
         ;;
     Darwin)
         case "$arch" in
-            x86_64) target="x86_64-apple-darwin" ;;
             arm64) target="aarch64-apple-darwin" ;;
-            *) err "unsupported architecture: $arch (try: cargo install --git https://github.com/$REPO)" ;;
+            *) err "no prebuilt binary for $arch macs (use: cargo install --git https://github.com/$REPO)" ;;
         esac
         ;;
     *)
