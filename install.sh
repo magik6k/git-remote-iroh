@@ -34,9 +34,14 @@ case "$os" in
         ;;
 esac
 
-tag=$(curl -fsSL "https://api.github.com/repos/$REPO/releases/latest" |
-    grep -o '"tag_name": *"[^"]*"' | head -n1 | cut -d'"' -f4)
-[ -n "$tag" ] || err "could not determine the latest release"
+# Resolve the latest release tag from the redirect target; this avoids the
+# rate-limited GitHub API.
+latest_url=$(curl -fsSLI -o /dev/null -w '%{url_effective}' "https://github.com/$REPO/releases/latest")
+tag=${latest_url##*/}
+case "$tag" in
+    v*) ;;
+    *) err "could not determine the latest release" ;;
+esac
 
 name="git-remote-iroh-$tag-$target"
 url="https://github.com/$REPO/releases/download/$tag/$name.tar.gz"
