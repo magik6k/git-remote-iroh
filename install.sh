@@ -80,15 +80,15 @@ case ":$PATH:" in
             echo "    $export_cmd"
             echo
             case "$shell_name" in
-                bash) rc="~/.bashrc" ;;
-                zsh) rc="~/.zshrc" ;;
-                ksh) rc="~/.kshrc" ;;
+                bash) rc="~/.bashrc" src="source ~/.bashrc" ;;
+                zsh) rc="~/.zshrc" src="source ~/.zshrc" ;;
+                ksh) rc="~/.kshrc" src=". ~/.kshrc" ;;
                 *) rc="" ;;
             esac
             if [ -n "$rc" ]; then
-                echo "To make it permanent:"
+                echo "Or permanently, effective in this shell right away:"
                 echo
-                echo "    echo '$export_cmd' >> $rc"
+                echo "    echo '$export_cmd' >> $rc && $src"
             else
                 echo "To make it permanent, add that line to your shell's startup file."
             fi
