@@ -59,5 +59,39 @@ echo "Installed $bin_dir/git-remote-iroh ($tag)"
 
 case ":$PATH:" in
     *":$bin_dir:"*) ;;
-    *) echo "note: $bin_dir is not on your PATH; add it so git can find the helper" ;;
+    *)
+        # Print copy-pasteable PATH setup, with $HOME kept symbolic so the
+        # commands work as-is in other sessions too.
+        case "$bin_dir" in
+            "$HOME"/*) display_dir="\$HOME${bin_dir#"$HOME"}" ;;
+            *) display_dir=$bin_dir ;;
+        esac
+        echo
+        echo "note: $bin_dir is not on your PATH; git needs it there to find the helper."
+        shell_name=$(basename "${SHELL:-sh}")
+        if [ "$shell_name" = fish ]; then
+            echo "To add it, now and permanently:"
+            echo
+            echo "    fish_add_path \"$display_dir\""
+        else
+            export_cmd="export PATH=\"$display_dir:\$PATH\""
+            echo "To use it in this shell:"
+            echo
+            echo "    $export_cmd"
+            echo
+            case "$shell_name" in
+                bash) rc="~/.bashrc" ;;
+                zsh) rc="~/.zshrc" ;;
+                ksh) rc="~/.kshrc" ;;
+                *) rc="" ;;
+            esac
+            if [ -n "$rc" ]; then
+                echo "To make it permanent:"
+                echo
+                echo "    echo '$export_cmd' >> $rc"
+            else
+                echo "To make it permanent, add that line to your shell's startup file."
+            fi
+        fi
+        ;;
 esac
